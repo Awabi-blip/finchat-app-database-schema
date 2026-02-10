@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS "points_transactions"(
     "id" BIGSERIAL,
     "sender_id" INT,
     "receiver_id" INT,
-    "amount_sent" DECIMAL (8,2) NOT NULL,
+    "amount_sent" DECIMAL (8,2) NOT NULL CHECK (amount_sent > 0),
     PRIMARY KEY("id"),
     FOREIGN KEY ("sender_id") REFERENCES "users"("id"),
     FOREIGN KEY ("receiver_id") REFERENCES "users"("id")

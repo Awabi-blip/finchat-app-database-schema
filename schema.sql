@@ -517,16 +517,16 @@ JOIN servers
     ON servers.id = messages_in_servers.server_id
 WHERE messages_in_servers.is_deleted = FALSE;
 
-CREATE INDEX "users_index" ON "users"("id","username","verified");
+CREATE INDEX "users_index" ON "users"("username","verified");
 
-CREATE INDEX "servers_index" ON "servers"("id", "server_name", "security_level");
+CREATE INDEX "servers_index" ON "servers"("server_name", "security_level");
 
-CREATE INDEX "users_in_servers_index" ON "users_in_servers"("user_id", "server_id", "role_id");
+CREATE INDEX "users_in_servers_index" ON "users_in_servers"("role_id");
 
 CREATE INDEX "points_balance_index" ON "points_balance"("user_id", "balance");
 CREATE INDEX "points_transactions_index" ON "points_transactions"("sender_id", "receiver_id", "amount_sent");
 CREATE INDEX "gifts_transactions_index" ON "gifts_transactions"("sender_id", "receiver_id", "gift_type"); -- added cus gift type is an enum only
 
-CREATE INDEX "messages_in_servers_index" ON "messages_in_servers"("id", "user_id", "server_id", "is_deleted", "sent_at");
+CREATE INDEX "messages_in_servers_index" ON "messages_in_servers"("user_id", "server_id", "is_deleted", "sent_at");
 
 CREATE INDEX "audit_log_index" ON "audit_logs"("message_id", "deleted_of_id", "deleted_by_id", "server_id");

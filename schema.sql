@@ -17,7 +17,7 @@ CREATE TYPE "users_status" AS ENUM ('Active', 'Moon Walking', 'Sensory Overload'
 CREATE TABLE IF NOT EXISTS "users" (
     "id" SERIAL,
     "username" VARCHAR(24) NOT NULL UNIQUE,
-    "password" VARCHAR(100) NOT NULL,
+    "password_hash" VARCHAR(512) NOT NULL,
     "display_name" VARCHAR(24),
     "badge" users_badge DEFAULT 'Vanilla Latte',
     "pfp" VARCHAR(255) DEFAULT 'xyz.jpg',

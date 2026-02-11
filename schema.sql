@@ -289,9 +289,39 @@ BEGIN
     -- CODE in TRANSACTION A reaches "UPDATE SEND BALANCE += AMOUNT WHERE USER IS ZOYA but zoya is locked"
     -- CODE in TRANSACTION B reached "UPDATE SEND BALANCE += AMOUNT WHERE USER IS AWAB but awab is locked"
     -- BOTH transactions come at a halt, because they can't go ahead, and this is a deadlock, so we lock both rows to begin with
-    -- the user that wins the race condition gets to make the entire transaction first, if awab locks both zoya and awab, and 
-    -- zoya tries to read her own balance, shes locked because awab is sending her money first.
-    PERFORM 1 FROM points_balance WHERE user_id IN (P_SENDER_ID, p_receiver_id) FOR UPDATE;
+    -- SELECT FOR UPDATE WORKS differently, it's locking as it is reading, because things are stored at different sectors in the disk, 
+    -- Imagine a case scanerio : Awab wins starts the query and Zoya starts the query at roughly 1ms apart
+    -- Now lets consider the time to run the queries, so Transaction A where Awab is sender, sends money to Zoya so sender is awab and 
+    -- receiver is Zoya, sender_id (Awab) gets locked at this instant, the 0.1ms when Zoya started the transaction, she locks her self because
+    -- she is the sender here, so technically she comes first, now when awab tries to lock zoya, (really what hes doing hes just selecting her
+    -- but PERFORM 1 is discarding the result, so when awab tries to read her after 0.2ms from his initial query, zoya is already locked, and
+    -- 0.1 ms after that zoya tries to read awab and lock him -> but there is a lock already there, now both queries cant process, because they are
+    -- waiting for locks to be released, but both queries literally don't process ahead because they rely on each other.
+    -- Time LINE :
+    -- t = 0 : Awab locks himself
+    -- t = 1 : Zoya locks her self
+    -- t = 2 : awab tries to lock zoya but she is already locked
+    -- t = 3 : zoya tries to lock but she is already locked
+    -- DEADLOCK since both queries are now at blink, waiting for each of them to finish but they wont run since they rely on each other
+    -- To solve this issue: we add a ORDER BY id (learnt, it did not come to me intuitively unfortunately tho i wish i did):
+    -- So when we say FOR UPDATE database as soon as it finds something it locks it, but if we LITERALLY say ORDER BY, it moves it's
+    -- Pointer in such a way that lower value comes first, so the lower value always get's locked first. NO matter the order of operations
+    -- Transaction A : (Awab, Zoya) (sender, reciever)
+    -- Transaction B : (Zoya, Awab) (sender, receiver)
+    -- ORDER BY (id orlets say name)
+    -- Awab locks Awab in the first query, even if it takes extra time for Transaction B to find Awab, it will find it first,
+    -- so Awab locked himself, when zoya tries to lock him, she can not but Awab can lock zoya now BECAUSE zoya has not locked her self yet.
+    -- So Transaction B is now on a lock but transaction A can continue, transaction A commits, then transaction B continues, because Awab
+    -- is now unlocked, considering there were not any other transactions trying to access Awab, that happened before transaction B, based on
+    -- the race condition, the row is unlocked and it is given to the user looking for it.
+    -- LET'S just say Awab wins the race and applies the lock, first, even if it takes him forever to lock Zoya,
+    -- the bidirectional can not be blocked because now in our database world HE ALWAYS locks himself before someone who comes after this name,
+    -- If he was sending money to Aman, who comes before him, then he locks Aman first, and if Aman tried to send Awab money, She locks herself first,
+    -- since awab locked her first, she cant do it and shes now on a wait, but what happens if now Zoya finds Awab before Awab processes Awab in the Aman situation?
+    -- THEN awab is at a lock not a deadlock, because Zoya processed awab before, sends him money, and then awab can send Aman. I think thats a nice
+    -- way to put this.
+
+    PERFORM 1 FROM points_balance WHERE user_id IN (p_sender_id, p_receiver_id) ORDER BY (user_id) FOR UPDATE;
     
     p_sender_balance := (SELECT balance FROM points_balance WHERE user_id = p_sender_id FOR UPDATE);
 

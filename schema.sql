@@ -214,13 +214,13 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION check_user_integrity()
 RETURNS TRIGGER AS $$
 DECLARE
-    v_verification BOOLEAN;
-    v_security_level TEXT;
+    f_verification BOOLEAN;
+    f_security_level TEXT;
 BEGIN
-    v_verification := (SELECT verified FROM users WHERE id = NEW.user_id);
-    v_security_level := (SELECT security_level FROM servers WHERE id = NEW.server_id);
+    f_verification := (SELECT verified FROM users WHERE id = NEW.user_id);
+    f_security_level := (SELECT security_level FROM servers WHERE id = NEW.server_id);
 
-    IF v_verification = FALSE AND v_security_level = 'Level 2' THEN
+    IF f_verification = FALSE AND f_security_level = 'Level 2' THEN
          RETURN NULL;
     ELSE
         RETURN NEW;

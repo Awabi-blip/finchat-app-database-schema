@@ -549,9 +549,11 @@ WHERE messages_in_servers.is_deleted = FALSE;
 
 CREATE INDEX "users_index" ON "users"("username") INCLUDE ("verified");
 
-CREATE INDEX "servers_index" ON "servers"("server_name", "security_level");
+CREATE INDEX "servers_index" ON "servers"("server_name") INCLUDE ("security_level");
 
-CREATE INDEX "users_in_servers_index" ON "users_in_servers"("role_id");
+CREATE INDEX "users_in_servers_index" ON "users_in_servers"("server_id") INCLUDE ("user_id", "role_id");
+CREATE INDEX "users_in_servers_index" ON "users_in_servers"("user_id") INCLUDE ("server_id", "role_id");
+
 
 CREATE INDEX "points_balance_index" ON "points_balance"("user_id", "balance");
 CREATE INDEX "points_transactions_index" ON "points_transactions"("sender_id", "receiver_id", "amount_sent");

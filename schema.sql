@@ -547,7 +547,7 @@ JOIN servers
     ON servers.id = messages_in_servers.server_id
 WHERE messages_in_servers.is_deleted = FALSE;
 
-CREATE INDEX "users_index" ON "users"("username","verified");
+CREATE INDEX "users_index" ON "users"("username") INCLUDE ("verified");
 
 CREATE INDEX "servers_index" ON "servers"("server_name", "security_level");
 

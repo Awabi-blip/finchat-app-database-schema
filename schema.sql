@@ -559,6 +559,6 @@ CREATE INDEX "points_transactions_index1" ON "points_transactions"("sender_id") 
 CREATE INDEX "points_transactions_index2" ON "points_transactions"("receiver_id") INCLUDE ("sender_id", "amount_sent");
 
 CREATE INDEX "messages_in_servers_index1" ON "messages_in_servers"("user_id") INCLUDE ("server_id", "is_deleted", "sent_at");
-CREATE INDEX "messages_in_servers_index2" ON "messages_in_servers"("server_id") INCLUDE ("server_id", "is_deleted", "sent_at");
+CREATE INDEX "messages_in_servers_index2" ON "messages_in_servers"("server_id") INCLUDE ("user_id", "is_deleted", "sent_at");
 
 CREATE INDEX "audit_log_index" ON "audit_logs" ("server_id") INCLUDE ("message_id", "deleted_of_id", "deleted_by_id");

@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS "messages_in_dms"(
 
 CREATE TABLE IF NOT EXISTS "points_balance"(
     "id" SERIAL,
-    "user_id" INT,
+    "user_id" INT UNIQUE, -- by default, FKs are not unique in 
     "balance" DECIMAL(8,2) NOT NULL DEFAULT 0.00,
     PRIMARY KEY("id"),
     FOREIGN KEY ("user_id") REFERENCES "users"("id")

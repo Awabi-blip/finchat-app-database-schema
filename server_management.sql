@@ -114,3 +114,12 @@ $$ LANGUAGE plpgsql;
 -- That was a problem because the arguments that already were passed into the main procedure,
 -- I was just getting them back again for no reason, which was an issue, so I fixed that.
 
+CREATE VIEW custom_sm AS
+SELECT users.id AS user_id, users.username, servers.server_name,
+messages_in_servers.message, messages_in_servers.attachment, messages_in_servers.sent_at
+FROM messages_in_servers
+JOIN users
+    ON users.id = messages_in_servers.user_id
+JOIN servers
+    ON servers.id = messages_in_servers.server_id
+WHERE messages_in_servers.is_deleted = FALSE;

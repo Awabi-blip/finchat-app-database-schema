@@ -16,12 +16,12 @@ CREATE TYPE "users_status" AS ENUM ('Active', 'Moon Walking', 'Sensory Overload'
 
 CREATE TABLE IF NOT EXISTS "users" (
     "id" SERIAL,
-    "username" VARCHAR(24) NOT NULL UNIQUE,
-    "password_hash" VARCHAR(512) NOT NULL,
-    "display_name" VARCHAR(24),
+    "username" TEXT NOT NULL UNIQUE,
+    "password_hash" TEXT NOT NULL,
+    "display_name" TEXT,
     "badge" users_badge DEFAULT 'Vanilla Latte',
-    "pfp" VARCHAR(255) DEFAULT 'xyz.jpg',
-    "bio" VARCHAR (500),
+    "pfp" TEXT DEFAULT 'xyz.jpg',
+    "bio" TEXT,
     "status" users_status DEFAULT 'Active',
     "verified" BOOLEAN NOT NULL,
     PRIMARY KEY ("id")
@@ -32,11 +32,11 @@ CREATE TYPE server_security_level AS ENUM ('Level 1', 'Level 2');
 
 CREATE TABLE IF NOT EXISTS "servers" (
     "id" SERIAL,
-    "server_name" VARCHAR(24) NOT NULL UNIQUE,
-    "display_name" VARCHAR(24) NOT NULL,
-    "banner" VARCHAR(255) DEFAULT 'server_banner.jpg',
-    "icon" VARCHAR(255) DEFAULT 'server_icon.jpg',
-    "description" VARCHAR(500),
+    "server_name" TEXT NOT NULL UNIQUE,
+    "display_name" TEXT NOT NULL,
+    "banner" TEXT DEFAULT 'server_banner.jpg',
+    "icon" TEXT DEFAULT 'server_icon.jpg',
+    "description" TEXT,
     "security_level" server_security_level DEFAULT 'Level 1',
     PRIMARY KEY ("id")
 );
@@ -61,8 +61,8 @@ CREATE TABLE IF NOT EXISTS "users_in_servers" (
     "server_id" INT,
     "role_id" INT DEFAULT 2,
     PRIMARY KEY ("user_id", "server_id"),
-    FOREIGN KEY ("user_id") REFERENCES "users"("id"),
-    FOREIGN KEY ("server_id") REFERENCES "servers"("id"),
+    FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE,
+    FOREIGN KEY ("server_id") REFERENCES "servers"("id") ON DELETE CASCADE,
     FOREIGN KEY ("role_id") REFERENCES "roles"("id")
 );
 
@@ -70,13 +70,13 @@ CREATE TABLE IF NOT EXISTS "messages_in_servers"(
     "id" SERIAL,
     "user_id" INT,
     "server_id" INT,
-    "message" VARCHAR (2000) NOT NULL,
-    "attachment" VARCHAR(255) DEFAULT NULL,
+    "message" TEXT NOT NULL,
+    "attachment" TEXT DEFAULT NULL,
     "sent_at" TIMESTAMPTZ(0) DEFAULT now(),
     "is_deleted" BOOLEAN DEFAULT FALSE NOT NULL,
     PRIMARY KEY ("id"),
-    FOREIGN KEY ("user_id") REFERENCES "users"("id"),
-    FOREIGN KEY ("server_id") REFERENCES "servers"("id")
+    FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE,
+    FOREIGN KEY ("server_id") REFERENCES "servers"("id") ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "audit_logs" (
@@ -86,21 +86,21 @@ CREATE TABLE IF NOT EXISTS "audit_logs" (
     "deleted_by_id" INT,
     "server_id" INT,
     PRIMARY KEY ("id"),
-    FOREIGN KEY ("message_id") REFERENCES "messages_in_servers"("id"),
-    FOREIGN KEY ("server_id") REFERENCES "servers"("id"),
-    FOREIGN KEY ("deleted_of_id") REFERENCES "users"("id"),
-    FOREIGN KEY ("deleted_by_id") REFERENCES "users"("id")
+    FOREIGN KEY ("message_id") REFERENCES "messages_in_servers"("id") ON DELETE CASCADE,
+    FOREIGN KEY ("server_id") REFERENCES "servers"("id") ON DELETE CASCADE,
+    FOREIGN KEY ("deleted_of_id") REFERENCES "users"("id") ON DELETE CASCADE,
+    FOREIGN KEY ("deleted_by_id") REFERENCES "users"("id") ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "messages_in_dms"(
     "id" SERIAL,
     "author_id" INT,
     "receiver_id" INT,
-    "message" VARCHAR (2000) NOT NULL,
-    "attachment" VARCHAR(255) DEFAULT NULL,
+    "message" TEXT NOT NULL,
+    "attachment" TEXT DEFAULT NULL,
     PRIMARY KEY ("id"),
-    FOREIGN KEY ("author_id") REFERENCES "users"("id"),
-    FOREIGN KEY ("receiver_id") REFERENCES "users"("id")
+    FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE CASCADE,
+    FOREIGN KEY ("receiver_id") REFERENCES "users"("id") ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "points_balance"(
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS "points_balance"(
     "user_id" INT UNIQUE, -- by default, FKs are not unique in 
     "balance" DECIMAL(8,2) NOT NULL DEFAULT 0.00,
     PRIMARY KEY("id"),
-    FOREIGN KEY ("user_id") REFERENCES "users"("id")
+    FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS "points_transactions"(
@@ -117,8 +117,8 @@ CREATE TABLE IF NOT EXISTS "points_transactions"(
     "receiver_id" INT,
     "amount_sent" DECIMAL (8,2) NOT NULL CHECK (amount_sent > 0),
     PRIMARY KEY("id"),
-    FOREIGN KEY ("sender_id") REFERENCES "users"("id"),
-    FOREIGN KEY ("receiver_id") REFERENCES "users"("id")
+    FOREIGN KEY ("sender_id") REFERENCES "users"("id") ON DELETE CASCADE,
+    FOREIGN KEY ("receiver_id") REFERENCES "users"("id") ON DELETE CASCADE
 );
 
 CREATE TYPE gifts AS ENUM ('earplugs', 'headphones', 'dim lights', 'fidget spinners', 'weighted blanket', 'fragrance');
@@ -143,8 +143,8 @@ CREATE TABLE IF NOT EXISTS "gifts_transactions" (
     "receiver_id" INT,
     "gift_type" gifts,
     PRIMARY KEY("id"),
-    FOREIGN KEY ("sender_id") REFERENCES "users"("id"),
-    FOREIGN KEY ("receiver_id") REFERENCES "users"("id"),
+    FOREIGN KEY ("sender_id") REFERENCES "users"("id") ON DELETE CASCADE,
+    FOREIGN KEY ("receiver_id") REFERENCES "users"("id") ON DELETE CASCADE,
     FOREIGN KEY ("gift_type") REFERENCES "gift_inventory"("type")
 );
 
@@ -153,8 +153,7 @@ CREATE TABLE IF NOT EXISTS "friends" (
     "user_1_id" INT,
     "user_2_id" INT,
     PRIMARY KEY ("user_1_id", "user_2_id"),
-    FOREIGN KEY ("user_1_id") REFERENCES "users"("id"),
-    FOREIGN KEY ("user_2_id") REFERENCES "users"("id"),
+    FOREIGN KEY ("user_1_id") REFERENCES "users"("id") ON DELETE CASCADE,
+    FOREIGN KEY ("user_2_id") REFERENCES "users"("id") ON DELETE CASCADE,
     CHECK ("user_1_id" <> "user_2_id")
 );
-

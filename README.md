@@ -103,15 +103,11 @@ The database has entities such as : USERS, SERVERS, ROLES, MESSAGES_IN_SERVERS, 
 
 ###### USERS
 
-    **username varchar(24)**: upto 24 chars should be enough to represent any unique username in the world, as well as easy frontend rendering for a name that does not take alot of space.
-    **password varchar(100)**: since passwords are stored as hash and they can easily take upto 70-90 characters, 100 is a good limit.
     **badge ENUM**: these were predefined badges that the user can add on their profile based on their neurodivergence type, i.e eclipse for BPD, or vanilla latte for neurotypicals.
     **verfication_status BOOLEAN**: because it can have a binary value of either True or False only.
 
 ###### SERVERS
 
-    **server_name varchar(24)**
-    upto 24 chars should be enough to represent any unique server name.
     **securiy_level ENUM**: altho boolean was okay, going with enum means that in future more levels can be added
 
 ###### ROLES

@@ -26,6 +26,11 @@ BEGIN
             'not possible';
     END IF;
 
+    IF p_sender_id = p_reciever_id THEN
+        RAISE EXCEPTION
+            'not possible';
+    END IF;
+    
     -- ADDED this to lock both rows upon transaction's start. This locks sender and reciever both to prevent deadlocks
     -- Imagine a scanerio where line 285 runs and it locks the sender, and then in another transaction, sender is the receiver
     -- and the row is locked for that sender, and imagine that the sender in that transaction is the receiver in this transaction
@@ -103,6 +108,11 @@ p_gift_price DECIMAL(7,2);
 p_sender_balance DECIMAL(8,2);
 p_valid_gift gifts;
 BEGIN
+
+    IF p_sender_id = p_reciever_id THEN
+        RAISE EXCEPTION
+            'not possible';
+    END IF;
 
     p_valid_gift := (SELECT type FROM gift_inventory WHERE type = p_gift_type);
 

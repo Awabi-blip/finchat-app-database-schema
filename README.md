@@ -108,7 +108,7 @@ The database has entities such as : USERS, SERVERS, ROLES, MESSAGES_IN_SERVERS, 
 
 ###### SERVERS
 
-    **securiy_level ENUM**: altho boolean was okay, going with enum means that in future more levels can be added
+    **security_level ENUM**: altho boolean was okay, going with enum means that in future more levels can be added
 
 ###### ROLES
 
@@ -118,7 +118,7 @@ The database has entities such as : USERS, SERVERS, ROLES, MESSAGES_IN_SERVERS, 
 
 ###### POINTS_BALANCE
 
-    **balance decmial(8,2)**: a good trade off for accuracy and storage, 6 figures should be enough for most transactions.
+    **balance decimal(8,2)**: a good trade off for accuracy and storage, 6 figures should be enough for most transactions.
 
 ###### GIFTS_INVENTORY:
 
@@ -162,7 +162,7 @@ The **check_user_integrity()** trigger exists to accompany the security check in
 
 **points/gifts_transactions_index** to compliment the view get_p_t logs to quickly fetch users and transactions using a covering index on sender_id, receiver_id and the amount_sent/gift sent.
 
-**audit_logs_inded** uses a covering index on message_id, deleter_id, deleted_id, server_id to quickly fetch the audit_logs when the get_audit_logs is called. Since the stored datatypes are only ints, I figured it's okay to with a 4 column covering index.
+**audit_logs_index** uses a covering index on message_id, deleter_id, deleted_id, server_id to quickly fetch the audit_logs when the get_audit_logs is called. Since the stored datatypes are only ints, I figured it's okay to with a 4 column covering index.
 
 
 ## Limitations

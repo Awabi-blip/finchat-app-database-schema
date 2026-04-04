@@ -130,7 +130,7 @@ The database has entities such as : USERS, SERVERS, ROLES, MESSAGES_IN_SERVERS, 
     **varchar (2000)** 2000 is a good limit for a messages, gives good enough upperbounds to send messages manageable to store.
 
 ### Relationships
-<img width="8192" height="1965" alt="ER_DIAGRAM" src="https://github.com/user-attachments/assets/01f145cf-2d6f-40fc-8704-7e88343b8215" />
+<img width="1600" height="1200" alt="contra_ERD_1(2)" src="https://github.com/user-attachments/assets/7b402d66-9637-46a9-b617-a620834f72f8" />
 
 **USERS**
 

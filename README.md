@@ -33,103 +33,73 @@ The database has entities such as : USERS, SERVERS, ROLES, MESSAGES_IN_SERVERS, 
 #### Attributes for each entity involves :
 
 **USERS**
-    id: Unique identifier (Primary Key).
-
-    username, display_name: Identity fields.
-
-    badge: Custom Enum (e.g., 'The Architect', 'Void Cat') to represent neurodivergent traits.
-
-    status: Custom Enum for current state (e.g., 'Sensory Overload').
-
-    pfp: Path to profile picture.
-
-    verified: Boolean flag for security checks.
+- id: Unique identifier (Primary Key).
+- username, display_name: Identity fields.
+- badge: Custom Enum (e.g., 'The Architect', 'Void Cat') to represent neurodivergent traits.
+- status: Custom Enum for current state (e.g., 'Sensory Overload').
+- pfp: Path to profile picture.
+- verified: Boolean flag for security checks.
 
 **Servers**
-
-    id: Unique identifier.
-
-    server_name: Unique internal name.
-
-    security_level: Enum ('Level 1', 'Level 2') for determining entry requirements.
-
-    banner, icon: Visual assets.
+- id: Unique identifier.
+- server_name: Unique internal name.
+- security_level: Enum ('Level 1', 'Level 2') for determining entry requirements.
+- banner, icon: Visual assets.
 
 **Roles**
-
-    id: Unique identifier.
-
-    name: Enum ('Member', 'Admin', 'Muted').
-
-    permissions: Array of text strings defining what the role can do.
+- id: Unique identifier.
+- name: Enum ('Member', 'Admin', 'Muted').
+- permissions: Array of text strings defining what the role can do.
 
 **Users_in_Servers (Junction Table)**
-
-    Links user_id and server_id.
-
-    Assigns a role_id to the user in that specific server.
+- Links user_id and server_id.
+- Assigns a role_id to the user in that specific server.
 
 **Messages_in_Servers**
-
-    id: Unique identifier.
-
-    message: The content (max 2000 chars).
-
-    attachment: Path to file (if any).
-
-    is_deleted: Soft delete flag (data remains for audit logs).
+- id: Unique identifier.
+- message: The content (max 2000 chars).
+- attachment: Path to file (if any).
+- is_deleted: Soft delete flag (data remains for audit logs).
 
 **Points_Balance**
-
-    user_id: Links to user.
-
-    balance: Decimal value for the balance that the user has.
+- user_id: Links to user.
+- balance: Decimal value for the balance that the user has.
 
 **Gift_Inventory**
-
-    type: Enum key for items (e.g., 'weighted blanket').
-
-    price: Cost of the item.
+- type: Enum key for items (e.g., 'weighted blanket').
+- price: Cost of the item.
 
 **Transactions** (points_transactions, gifts_transactions)
-
-    Logs sender_id, receiver_id, and amount/gift_type to track the flow of the economy.
+- Logs sender_id, receiver_id, and amount/gift_type to track the flow of the economy.
 
 **Audit_Logs**
+- Tracks deleted messages (message_id) alongside the deleted_by_id and the deleted_of_id (victim) for management system.
 
-    Tracks deleted messages (message_id) alongside the deleted_by_id and the deleted_of_id (victim) for management system.
 #### Types used:
 
 ##### All primary key ids used SERIAL for auto-increment.
 ##### all pictures: storing images within the database would make it extremely heavy and slow, and considering that, a user can upload an image which can be stored in a folder, and it's path can be referenced within the database.
 
 ###### USERS
-
-    **badge ENUM**: these were predefined badges that the user can add on their profile based on their neurodivergence type, i.e eclipse for BPD, or vanilla latte for neurotypicals.
-    **verfication_status BOOLEAN**: because it can have a binary value of either True or False only.
+- **badge ENUM**: these were predefined badges that the user can add on their profile based on their neurodivergence type, i.e eclipse for BPD, or vanilla latte for neurotypicals.
+- **verfication_status BOOLEAN**: because it can have a binary value of either True or False only.
 
 ###### SERVERS
-
-    **security_level ENUM**: altho boolean was okay, going with enum means that in future more levels can be added
+- **security_level ENUM**: altho boolean was okay, going with enum means that in future more levels can be added
 
 ###### ROLES
-
-    **permissions TEXT[]**: an array was used to store multiple permissions in the same row for simplicity purposes.
-
-    **The roles table is essentially a lookup table, with the default role given to users upon joining a new server being member with send, delete and view messages permissions**
+- **permissions TEXT[]**: an array was used to store multiple permissions in the same row for simplicity purposes.
+- **The roles table is essentially a lookup table, with the default role given to users upon joining a new server being member with send, delete and view messages permissions**
 
 ###### POINTS_BALANCE
-
-    **balance decimal(8,2)**: a good trade off for accuracy and storage, 6 figures should be enough for most transactions.
+- **balance decimal(8,2)**: a good trade off for accuracy and storage, 6 figures should be enough for most transactions.
 
 ###### GIFTS_INVENTORY:
-
-    **type ENUM** ENUM for items, i.e weighted blanket
-    **price decimal(7,2)** the highest price set for a gift is 3 figures so 5 gives a good stress test and possibilites for more expensive items to be added.
+- **type ENUM** ENUM for items, i.e weighted blanket
+- **price decimal(7,2)** the highest price set for a gift is 3 figures so 5 gives a good stress test and possibilites for more expensive items to be added.
 
 ###### MESSAGES:
-
-    **varchar (2000)** 2000 is a good limit for a messages, gives good enough upperbounds to send messages manageable to store.
+- **varchar (2000)** 2000 is a good limit for a messages, gives good enough upperbounds to send messages manageable to store.
 
 ### Relationships
 <img width="1601" height="827" alt="contra_ERD_1" src="https://github.com/user-attachments/assets/ea8ae1b7-b95f-4eb0-8b82-2b7004b3adcb" />
@@ -163,7 +133,6 @@ The **check_user_integrity()** trigger exists to accompany the security check in
 **points/gifts_transactions_index** to compliment the view get_p_t logs to quickly fetch users and transactions using a covering index on sender_id, receiver_id and the amount_sent/gift sent.
 
 **audit_logs_index** uses a covering index on message_id, deleter_id, deleted_id, server_id to quickly fetch the audit_logs when the get_audit_logs is called. Since the stored datatypes are only ints, I figured it's okay to with a 4 column covering index.
-
 
 ## Limitations
 

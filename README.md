@@ -4,6 +4,8 @@ By Muhammad Awab
 
 Video overview: <https://youtu.be/xsSlE-J1fzU>
 
+A chat application database with virtual economy system
+
 ## Scope
 
 The purpose of this database is to provide a rigid backend database for a chat application

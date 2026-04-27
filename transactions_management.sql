@@ -82,7 +82,7 @@ BEGIN
         RAISE EXCEPTION 'no balance added, hence no transactions must take place, fair as all things must be. period.';
     END IF;
 
-    IF p_sender_balance <= 0 OR P_sender_balance < p_amount_sent THEN
+    IF p_sender_balance <= 0 OR p_sender_balance < p_amount_sent THEN
         RAISE EXCEPTION 'not enough balance';
     END IF;
 
